@@ -10,7 +10,6 @@
   "author": "Luis Ramirez",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
     "twitter": "^1.7.1"
   }
 }
