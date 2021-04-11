@@ -19,9 +19,9 @@ Twtr.get('search/tweets', params, function (err, data, response) {
                 id: data.statuses[i].id_str
             }
             // favorite the tweet
-            T.post('favorites/create', id, function (err, response) {
+            Twtr.post('favorites/create', id, function (err, response) {
                 if (err) {
-                    console.log(err[0].message);
+                    console.log(err.message);
                 } else {
                     let username = response.user.screen_name;
                     let tweetId = response.id_str;
