@@ -73,7 +73,7 @@ function reTweet(searchText) {
     })
 }
 
-// Run every 30 minutes
+// Run every 1 minute
 setInterval(function () {
     reTweet('#spaceX OR #NASA OR #esa');
-}, 600000)
+}, 60000)
