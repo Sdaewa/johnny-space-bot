@@ -1,1 +1,1 @@
-worker: johnny-space-bot.js
+worker: script.js
