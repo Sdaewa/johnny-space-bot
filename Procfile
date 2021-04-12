@@ -1,1 +1,1 @@
-worker: johnny-five-bot
+worker: johnny-space-bot
