@@ -22,8 +22,6 @@ function reTweet(searchText) {
 
             for (let tweet of tweets) {
 
-                tweetIDList.push(tweet.id_str);
-
                 //avoid duplicates
                 if (tweet.text.startsWith('RT @')) {
                     if (tweet.retweeted_status) {
