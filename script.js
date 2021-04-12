@@ -1,35 +1,79 @@
-const Twitter = require('twitter');
 const config = require('./config.js');
-const Twtr = new Twitter(config);
+const twit = require('twit');
+const T = new twit(config);
 
-//set search params
-let params = {
-    q: '#spaceX',
-    count: 10,
-    result_type: 'recent',
-    lang: 'en'
+
+function reTweet(searchText) {
+    // set search params
+    let params = {
+        q: searchText + '',
+        result_type: 'recent',
+        lang: 'en',
+        count: 10,
+    };
+
+    T.get('search/tweets', params, function (err_search, data_search, response_search) {
+
+        let tweets = data_search.statuses
+
+        if (!err_search) {
+
+            let tweetIDList = []
+
+            for (let tweet of tweets) {
+
+                tweetIDList.push(tweet.id_str);
+
+                //avoid duplicates
+                if (tweet.text.startsWith('RT @')) {
+                    if (tweet.retweeted_status) {
+
+                        tweetIDList.push(tweet.retweeted_status.id_str);
+                    } else {
+
+                        tweetIDList.push(tweet.id_str);
+                    }
+                } else {
+
+                    tweetIDList.push(tweet.id_str);
+                }
+            };
+
+
+            // unique elements from an array
+            function onlyUnique(value, index, self) {
+                return self.indexOf(value) === index;
+            }
+
+            // unique entries
+            tweetIDList = tweetIDList.filter(onlyUnique)
+
+
+            // retweeting EACH of the tweetID
+            for (let tweetID of tweetIDList) {
+                T.post('statuses/retweet/:id', {
+
+                    id: tweetID
+                }, function (err_rt, data_rt, response_rt) {
+                    if (!err_rt) {
+
+                        console.log("\n\nRetweeted! ID - " + tweetID)
+                    } else {
+
+                        console.log("Duplication found ID => " + tweetID)
+                        console.log("Error = " + err_rt)
+                    }
+                })
+            }
+        } else {
+
+            console.log("Error searching" + err_search)
+            process.exit(1)
+        }
+    })
 }
 
-Twtr.get('search/tweets', params, function (err, data, response) {
-    if (!err) {
-        // Loop through tweets
-        for (let i = 0; i < data.statuses.length; i++) {
-            // Get tweet ID
-            let id = {
-                id: data.statuses[i].id_str
-            }
-            // favorite the tweet
-            Twtr.post('favorites/create', id, function (err, response) {
-                if (err) {
-                    console.log(err.message);
-                } else {
-                    let username = response.user.screen_name;
-                    let tweetId = response.id_str;
-                    console.log('Favorited: ', `https://twitter.com/${username}/status/${tweetId}`)
-                }
-            });
-        }
-    } else {
-        console.log(err);
-    }
-});
+// Run every 30 minutes
+setInterval(function () {
+    reTweet('#spaceX OR #NASA OR #esa');
+}, 1800000)
