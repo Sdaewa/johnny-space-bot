@@ -2,15 +2,6 @@
 
 Twitter bot that retweets news about NASA, SpaceX and ESA 🚀
 
-## Installation
-
-
-
-```bash
-npm install
-```
-
-
 ## Sources
 
 - Twitter API
