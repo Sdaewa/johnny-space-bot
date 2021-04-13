@@ -1,1 +1,1 @@
-worker: script.js
+worker: node script.js

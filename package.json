@@ -1,9 +1,10 @@
 {
   "name": "johnny-space-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Twitter bot that retweets news about NASA, SpaceX and ESA 🚀",
   "main": "script.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node script.js"
   },
   "keywords": [],
@@ -12,5 +13,14 @@
   "dependencies": {
     "dotenv": "^8.2.0",
     "twit": "^2.2.11"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sdaewa/johnny-space-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sdaewa/ohnny-space-bot/issues"
+  },
+  "homepage": "https://github.com/Sdaewa/ohnny-space-bot#readme"
 }
