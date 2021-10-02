@@ -2,9 +2,9 @@ const config = require("./config.js");
 const twit = require("twit");
 const T = new twit(config);
 
-function reTweet(searchText) {
+const reTweet = (searchText) => {
   // set search params
-  let params = {
+  const params = {
     q: searchText + "",
     result_type: "recent",
     lang: "en",
@@ -34,9 +34,9 @@ function reTweet(searchText) {
         }
 
         // unique elements from an array
-        function onlyUnique(value, index, self) {
+        const onlyUnique = (value, index, self) => {
           return self.indexOf(value) === index;
-        }
+        };
 
         // unique entries
         tweetIDList = tweetIDList.filter(onlyUnique);
@@ -48,7 +48,7 @@ function reTweet(searchText) {
             {
               id: tweetID,
             },
-            function (err_rt, data_rt, response_rt) {
+            (err_rt, data_rt, response_rt) => {
               if (!err_rt) {
                 console.log("\n\nRetweeted! ID - " + tweetID);
               } else {
@@ -64,9 +64,9 @@ function reTweet(searchText) {
       }
     }
   );
-}
+};
 
 // Run every 1 hour
-setInterval(function () {
-  reTweet("#spaceX OR #NASA");
-}, 3600000);
+setInterval(() => {
+  reTweet("#RussiaMilitary OR #USAMilitary");
+}, 6000);
