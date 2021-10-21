@@ -66,7 +66,7 @@ const reTweet = (searchText) => {
   );
 };
 
-// Run every 1 hour
+// Run every 5 hours
 setInterval(() => {
   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");
-}, 60000);
+}, 18000000);
