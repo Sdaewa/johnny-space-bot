@@ -66,7 +66,29 @@ const reTweet = (searchText) => {
   );
 };
 
+function tweetThis() {
+  var statsArray = ["hello", "How ya doin", "I love node"];
+  //selects random tweets from the array
+  var stat = statsArray[Math.floor(Math.random() * statsArray.length)];
+
+  var tweet = {
+    status: stat,
+  };
+
+  T.post("statuses/update", tweet, tweeted);
+
+  function tweeted(err, data, response) {
+    if (err) {
+      console.log("Something is wrong");
+    } else {
+      console.log("Works fine");
+    }
+  }
+}
+
 // Run every 5 hours
 setInterval(() => {
   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");
 }, 18000000);
+
+setInterval(tweetThis, 60000); //every 1 hour
