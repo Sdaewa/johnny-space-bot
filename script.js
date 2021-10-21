@@ -68,5 +68,5 @@ const reTweet = (searchText) => {
 
 // Run every 1 hour
 setInterval(() => {
-  reTweet("#RussiaMilitary OR #USAMilitary");
-}, 6000);
+  reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");
+}, 60000);
