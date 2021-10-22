@@ -159,8 +159,7 @@ function tweetImage() {
 // }, 10000);
 
 // setInterval(() => {
-//   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");     // Run every 5 hours
+//   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration #blackHole"); // Run every 5 hours
 // }, 18000000);
 
-// setInterval(tweetNews, 60000); //every 1 hour
-tweetNews();
+// setInterval(tweetNews, 28800000); //every 8 hour
