@@ -1,12 +1,7 @@
-const config = require("./config.js");
-const twit = require("twit");
-
 const tweetApod = require("./tweetApod");
 const reTweet = require("./reTweet");
 const tweetNews = require("./tweetNews");
 const tweetReport = require("./tweetReport");
-
-const T = new twit(config);
 
 // RETWEET
 reTweet(
