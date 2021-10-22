@@ -3,10 +3,15 @@ const config = require("./config.js");
 const axios = require("axios");
 const http = require("http");
 const twit = require("twit");
+const fs = require("fs");
+const request = require("request");
+const os = require("os");
+const tmpDir = os.tmpdir();
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 const imageToBase64 = require("image-to-base64");
-const { response } = require("express");
+const { res } = require("express");
+const getAPOD = require("./getpic");
 
 const app = express();
 
@@ -97,7 +102,7 @@ function tweetNews() {
       status: articleTitle + " " + articleUrl,
     };
 
-    function tweeted(err, data, response) {
+    function tweeted(err, data, res) {
       if (err) {
         console.log("Error:", err);
       } else {
@@ -121,7 +126,7 @@ function tweetReport() {
       status: articleSite + " - " + articleTitle + " " + articleUrl,
     };
 
-    function tweeted(err, data, response) {
+    function tweeted(err, data, res) {
       if (err) {
         console.log("Error:", err);
       } else {
@@ -135,111 +140,89 @@ function tweetReport() {
 
 // ASTRONOMY IMAGE OF THE DAY
 
-function tweetImage() {
-  axios
-    .get(
-      `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
-    )
-    .then((res) => {
-      let imageTitle = res.data.title.split("//")[1];
-      let imageUrl = res.data.url;
-      let imageDate = res.data.date;
-      let imageCopyright = res.data.copyright;
+// function tweetImage() {
+//   axios
+//     .get(
+//       `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
+//     )
+//     .then((res) => {
+//       let imageTitle = res.data.title.split("//")[1];
+//       let imageUrl = res.data.url;
+//       let imageDate = res.data.date;
+//       let imageCopyright = res.data.copyright;
 
-      axios
-        .get(imageUrl)
-        .then((res) => {
-          imageToBase64(res.config.url)
-            .then((response) => {
-              const imageData = `data:image/jpeg;base64,${response}`;
-              cloudinary.uploader
-                .upload(imageData)
-                .then((result) => {
-                  console.log("succes");
-                  response.status(200).send({
-                    message: "success",
-                    result,
-                  });
-                })
-                .catch((error) => {
-                  response.status(500).send({
-                    message: "failure",
-                    error,
-                  });
-                });
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+//       axios
+//         .get(imageUrl)
+//         .then((res) => {
+//           imageToBase64(res.config.url)
+//             .then((res) => {
+//               const imageData = `data:image/jpg;base64,${res}`;
+//               T.postMediaChunked(
+//                 "media/upload",
+//                 { media_data: imageData },
+//                 function (err, data, res) {
+//                   console.log(data);
+//                   // now we can assign alt text to the media, for use by screen readers and
+//                   // other text-based presentations and interpreters
+//                   var mediaIdStr = data.media_id_string;
+//                   var altText = imageTitle;
+//                   var meta_params = {
+//                     media_id: mediaIdStr,
+//                     alt_text: { text: altText },
+//                   };
 
-      // T.post(
-      //   "media/upload",
-      //   { media_data: imageUrl },
-      //   function (err, data, response) {
-      //     if (err) {
-      //       console.log("Error:", err);
-      //     } else {
-      //       /* Add image description. */
-      //       const image = data;
-      //       console.log("Image uploaded, adding description...");
+//                   T.post(
+//                     "media/metadata/create",
+//                     meta_params,
+//                     function (err, data, response) {
+//                       if (!err) {
+//                         // now we can reference the media and post a tweet (media will attach to the tweet)
+//                         var params = {
+//                           status:
+//                             imageTitle + " " + imageDate + " " + imageCopyright,
+//                           media_ids: [mediaIdStr],
+//                         };
 
-      //       T.post(
-      //         "media/metadata/create",
-      //         {
-      //           media_id: image.media_id_string,
-      //           alt_text: {
-      //             text: imageTitle,
-      //           },
-      //         },
-      //         function (err, data, response) {
-      //           /* And finally, post a tweet with the image. */
-
-      //           T.post(
-      //             "statuses/update",
-      //             {
-      //               status: `Image source: ${imageSource}`,
-      //               media_ids: [image.media_id_string],
-      //             },
-      //             function (err, data, response) {
-      //               if (err) {
-      //                 console.log("Error:", err);
-      //               } else {
-      //                 console.log("Done");
-      //               }
-      //             }
-      //           );
-      //         }
-      //       );
-      //     }
-      //   }
-      // );
-
-      // const tweet = {
-      //   status: `${imageTitle}
-
-      //   ${imageUrl}
-
-      //   ${imageCopyright}`,
-      // };
-
-      // function tweeted(err, data, response) {
-      //   if (err) {
-      //     console.log("Error:", err);
-      //   } else {
-      //     console.log("Done");
-      //   }
-      // }
-
-      // T.post("statuses/update", tweet, tweeted);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+//                         T.post(
+//                           "statuses/update",
+//                           params,
+//                           function (err, data, response) {
+//                             console.log(data);
+//                           }
+//                         );
+//                       }
+//                     }
+//                   );
+//                 }
+//               );
+//               // cloudinary.uploader
+//               //   .upload(imageData)
+//               //   .then((result) => {
+//               //     console.log("succes");
+//               //     res.status(200).send({
+//               //       message: "success",
+//               //       result,
+//               //     });
+//               //   })
+//               //   .catch((error) => {
+//               //     res.status(500).send({
+//               //       message: "failure",
+//               //       error,
+//               //     });
+//               //   });
+//             })
+//             .catch((error) => {
+//               console.log(error);
+//             });
+//         })
+//         .catch((err) => {
+//           console.log(err);
+//         });
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// }
 
 // setInterval(function () {
 //   tweetImage();
@@ -253,4 +236,6 @@ function tweetImage() {
 
 // setInterval(tweetNews, 28800000); //every 8 hour
 
-tweetImage();
+// tweetImage();
+
+getAPOD();
