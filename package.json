@@ -11,10 +11,10 @@
   "author": "Luis Ramirez",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.23.0",
     "dotenv": "^10.0.0",
     "twit": "^2.2.11"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sdaewa/johnny-space-bot.git"

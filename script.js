@@ -2,6 +2,8 @@ const config = require("./config.js");
 const twit = require("twit");
 const T = new twit(config);
 
+// RETWEET
+
 const reTweet = (searchText) => {
   // set search params
   const params = {
@@ -53,42 +55,108 @@ const reTweet = (searchText) => {
                 console.log("\n\nRetweeted! ID - " + tweetID);
               } else {
                 console.log("Duplication found ID => " + tweetID);
-                console.log("Error = " + err_rt);
+                console.log("Error:", err_rt);
               }
             }
           );
         }
       } else {
-        console.log("Error searching" + err_search);
+        console.log("Error searching:", err_search);
         process.exit(1);
       }
     }
   );
 };
 
-function tweetThis() {
-  var statsArray = ["hello", "How ya doin", "I love node"];
+// NEWS
+
+function tweetNews() {
+  const statsArray = ["hello", "How ya doin", "I love node"];
   //selects random tweets from the array
-  var stat = statsArray[Math.floor(Math.random() * statsArray.length)];
+  const stat = statsArray[Math.floor(Math.random() * statsArray.length)];
 
-  var tweet = {
-    status: stat,
+  const tweet = {
+    status:
+      "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00002/ids/fdr/browse/zcam/ZRF_0002_0667131195_000FDR_N0010052AUT_04096_0260LUJ01_1200.jpg",
   };
-
-  T.post("statuses/update", tweet, tweeted);
 
   function tweeted(err, data, response) {
     if (err) {
-      console.log("Something is wrong");
+      console.log("Error:", err);
     } else {
-      console.log("Works fine");
+      console.log("Done");
     }
   }
+
+  T.post("statuses/update", tweet, tweeted);
 }
 
-// Run every 5 hours
-setInterval(() => {
-  reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");
-}, 18000000);
+// ASTRONOMY IMAGE OF THE DAY
 
-setInterval(tweetThis, 60000); //every 1 hour
+function tweetImage() {
+  /* Then pick a random image from the images object. */
+
+  const image = randomFromArray(images);
+  console.log("opening an image...", image);
+
+  const imagePath = path.join(__dirname, "/images/" + image.file);
+  const imageSource = image.source;
+  const imageData = fs.readFileSync(imagePath, { encoding: "base64" });
+
+  /* Upload the image to Twitter. */
+
+  console.log("Uploading...", imagePath);
+
+  T.post(
+    "media/upload",
+    { media_data: imageData },
+    function (err, data, response) {
+      if (err) {
+        console.log("error:", err);
+      } else {
+        /* Add image description. */
+
+        const image = data;
+        console.log("Image uploaded, adding description...");
+
+        T.post(
+          "media/metadata/create",
+          {
+            media_id: image.media_id_string,
+            alt_text: {
+              text: "Describe the image",
+            },
+          },
+          function (err, data, response) {
+            /* And finally, post a tweet with the image. */
+
+            T.post(
+              "statuses/update",
+              {
+                status: `Image source: ${imageSource}`,
+                media_ids: [image.media_id_string],
+              },
+              function (err, data, response) {
+                if (err) {
+                  console.log("Error:", err);
+                } else {
+                  console.log("Done");
+                }
+              }
+            );
+          }
+        );
+      }
+    }
+  );
+}
+
+// setInterval(function () {
+//   tweetImage();
+// }, 10000);
+
+// setInterval(() => {
+//   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");     // Run every 5 hours
+// }, 18000000);
+
+setInterval(tweetNews, 60000); //every 1 hour
