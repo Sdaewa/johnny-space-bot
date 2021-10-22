@@ -9,6 +9,9 @@ const tweetReport = require("./tweetReport");
 const T = new twit(config);
 
 // RETWEET
+reTweet(
+  "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration #blackHole"
+);
 setInterval(() => {
   reTweet(
     "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration #blackHole"
