@@ -1,10 +1,25 @@
+const express = require("express");
 const config = require("./config.js");
 const axios = require("axios");
 const http = require("http");
 const twit = require("twit");
+const cloudinary = require("cloudinary").v2;
+const streamifier = require("streamifier");
+const imageToBase64 = require("image-to-base64");
+const { response } = require("express");
+
+const app = express();
 
 const T = new twit(config);
 
+// cloudinary.config({
+//   cloud_name: process.env.CLOUD_NAME,
+//   api_key: process.env.CLOUD_API_KEY,
+//   api_secret: process.env.CLOUD_API_SECRET,
+// });
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // RETWEET
 
 const reTweet = (searchText) => {
@@ -94,64 +109,136 @@ function tweetNews() {
   });
 }
 
+// ISS DAILY REPORT
+
+function tweetReport() {
+  axios.get("https://api.spaceflightnewsapi.net/v3/reports").then((res) => {
+    let articleTitle = res.data[0].title;
+    let articleSite = res.data[0].newsSite;
+    let articleUrl = res.data[0].url;
+
+    const tweet = {
+      status: articleSite + " - " + articleTitle + " " + articleUrl,
+    };
+
+    function tweeted(err, data, response) {
+      if (err) {
+        console.log("Error:", err);
+      } else {
+        console.log("Done");
+      }
+    }
+
+    T.post("statuses/update", tweet, tweeted);
+  });
+}
+
 // ASTRONOMY IMAGE OF THE DAY
 
 function tweetImage() {
-  /* Then pick a random image from the images object. */
+  axios
+    .get(
+      `https://api.nasa.gov/planetary/apod?api_key=${process.env.NASA_API_KEY}`
+    )
+    .then((res) => {
+      let imageTitle = res.data.title.split("//")[1];
+      let imageUrl = res.data.url;
+      let imageDate = res.data.date;
+      let imageCopyright = res.data.copyright;
 
-  const image = randomFromArray(images);
-  console.log("opening an image...", image);
+      axios
+        .get(imageUrl)
+        .then((res) => {
+          imageToBase64(res.config.url)
+            .then((response) => {
+              const imageData = `data:image/jpeg;base64,${response}`;
+              cloudinary.uploader
+                .upload(imageData)
+                .then((result) => {
+                  console.log("succes");
+                  response.status(200).send({
+                    message: "success",
+                    result,
+                  });
+                })
+                .catch((error) => {
+                  response.status(500).send({
+                    message: "failure",
+                    error,
+                  });
+                });
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
 
-  const imagePath = path.join(__dirname, "/images/" + image.file);
-  const imageSource = image.source;
-  const imageData = fs.readFileSync(imagePath, { encoding: "base64" });
+      // T.post(
+      //   "media/upload",
+      //   { media_data: imageUrl },
+      //   function (err, data, response) {
+      //     if (err) {
+      //       console.log("Error:", err);
+      //     } else {
+      //       /* Add image description. */
+      //       const image = data;
+      //       console.log("Image uploaded, adding description...");
 
-  /* Upload the image to Twitter. */
+      //       T.post(
+      //         "media/metadata/create",
+      //         {
+      //           media_id: image.media_id_string,
+      //           alt_text: {
+      //             text: imageTitle,
+      //           },
+      //         },
+      //         function (err, data, response) {
+      //           /* And finally, post a tweet with the image. */
 
-  console.log("Uploading...", imagePath);
+      //           T.post(
+      //             "statuses/update",
+      //             {
+      //               status: `Image source: ${imageSource}`,
+      //               media_ids: [image.media_id_string],
+      //             },
+      //             function (err, data, response) {
+      //               if (err) {
+      //                 console.log("Error:", err);
+      //               } else {
+      //                 console.log("Done");
+      //               }
+      //             }
+      //           );
+      //         }
+      //       );
+      //     }
+      //   }
+      // );
 
-  T.post(
-    "media/upload",
-    { media_data: imageData },
-    function (err, data, response) {
-      if (err) {
-        console.log("error:", err);
-      } else {
-        /* Add image description. */
+      // const tweet = {
+      //   status: `${imageTitle}
 
-        const image = data;
-        console.log("Image uploaded, adding description...");
+      //   ${imageUrl}
 
-        T.post(
-          "media/metadata/create",
-          {
-            media_id: image.media_id_string,
-            alt_text: {
-              text: "Describe the image",
-            },
-          },
-          function (err, data, response) {
-            /* And finally, post a tweet with the image. */
+      //   ${imageCopyright}`,
+      // };
 
-            T.post(
-              "statuses/update",
-              {
-                status: `Image source: ${imageSource}`,
-                media_ids: [image.media_id_string],
-              },
-              function (err, data, response) {
-                if (err) {
-                  console.log("Error:", err);
-                } else {
-                  console.log("Done");
-                }
-              }
-            );
-          }
-        );
-      }
-    }
-  );
+      // function tweeted(err, data, response) {
+      //   if (err) {
+      //     console.log("Error:", err);
+      //   } else {
+      //     console.log("Done");
+      //   }
+      // }
+
+      // T.post("statuses/update", tweet, tweeted);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 // setInterval(function () {
@@ -162,4 +249,8 @@ function tweetImage() {
 //   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration #blackHole"); // Run every 5 hours
 // }, 18000000);
 
+// setInterval(tweetReport, 28800000); //every 8 hour
+
 // setInterval(tweetNews, 28800000); //every 8 hour
+
+tweetImage();
