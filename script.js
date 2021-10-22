@@ -1,5 +1,8 @@
 const config = require("./config.js");
+const axios = require("axios");
+const http = require("http");
 const twit = require("twit");
+
 const T = new twit(config);
 
 // RETWEET
@@ -71,24 +74,24 @@ const reTweet = (searchText) => {
 // NEWS
 
 function tweetNews() {
-  const statsArray = ["hello", "How ya doin", "I love node"];
-  //selects random tweets from the array
-  const stat = statsArray[Math.floor(Math.random() * statsArray.length)];
+  axios.get("https://api.spaceflightnewsapi.net/v3/articles").then((res) => {
+    let articleTitle = res.data[0].title;
+    let articleUrl = res.data[0].url;
 
-  const tweet = {
-    status:
-      "https://mars.nasa.gov/mars2020-raw-images/pub/ods/surface/sol/00002/ids/fdr/browse/zcam/ZRF_0002_0667131195_000FDR_N0010052AUT_04096_0260LUJ01_1200.jpg",
-  };
+    const tweet = {
+      status: articleTitle + " " + articleUrl,
+    };
 
-  function tweeted(err, data, response) {
-    if (err) {
-      console.log("Error:", err);
-    } else {
-      console.log("Done");
+    function tweeted(err, data, response) {
+      if (err) {
+        console.log("Error:", err);
+      } else {
+        console.log("Done");
+      }
     }
-  }
 
-  T.post("statuses/update", tweet, tweeted);
+    T.post("statuses/update", tweet, tweeted);
+  });
 }
 
 // ASTRONOMY IMAGE OF THE DAY
@@ -159,4 +162,5 @@ function tweetImage() {
 //   reTweet("#spaceX OR #Mars OR #Nasa OR #blueOrigin");     // Run every 5 hours
 // }, 18000000);
 
-setInterval(tweetNews, 60000); //every 1 hour
+// setInterval(tweetNews, 60000); //every 1 hour
+tweetNews();
