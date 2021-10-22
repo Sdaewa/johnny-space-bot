@@ -23,14 +23,14 @@ const getPhoto = () => {
   });
 };
 
-function saveFile(body) {
+const saveFile = (body) => {
   console.log("body=>", body);
   const fileName =
     body.media_type === "image/jpeg || image/jpg" ? "nasa.jpg" : "nasa.mp4";
   const filePath = path.join(tmpDir + `/${fileName}`);
 
   console.log(`saveFile: file PATH ${filePath}`);
-  if (fileName === "nasa.mp4") {
+  if (fileName === undefined) {
     // tweet the link
     const params = {
       status: "NASA video link: " + body.url,
@@ -51,9 +51,9 @@ function saveFile(body) {
         uploadMedia(descriptionText, filePath);
       }
     });
-}
+};
 
-function uploadMedia(descriptionText, fileName) {
+const uploadMedia = (descriptionText, fileName) => {
   console.log(`uploadMedia: file PATH ${fileName}`);
   T.postMediaChunked(
     {
@@ -72,9 +72,9 @@ function uploadMedia(descriptionText, fileName) {
       }
     }
   );
-}
+};
 
-function postStatus(params) {
+const postStatus = (params) => {
   T.post("statuses/update", params, (err, data, respone) => {
     if (err) {
       console.log(err);
@@ -82,6 +82,6 @@ function postStatus(params) {
       console.log("Status posted!");
     }
   });
-}
+};
 
 module.exports = getPhoto;
