@@ -1,26 +1,26 @@
-const config = require("./config.js");
-const twit = require("twit");
-
 const tweetApod = require("./tweetApod");
 const reTweet = require("./reTweet");
 const tweetNews = require("./tweetNews");
 const tweetReport = require("./tweetReport");
 
-const T = new twit(config);
-
 // RETWEET
-setInterval(() => {
-  reTweet(
-    "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration OR #blackHole"
-  ); //every 5 hours
-}, 18000000);
-reTweet();
-// "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration OR #blackHole"
+
+// setInterval(() => {
+//   reTweet(); //every 5 hours
+// }, 18000000);
+// reTweet();
+
 // NEWS
-setInterval(tweetNews, 28800000); //every 8 hour
+
+// setInterval(tweetNews, 28800000); //every 8 hour
+// tweetNews();
 
 // ISS DAILY REPORT
-setInterval(tweetReport, 28800000); //every 8 hour
+
+// setInterval(tweetReport, 86400000); //every 24 hour
+// tweetReport();
 
 // ASTRONOMY IMAGE OF THE DAY
-setInterval(tweetApod, 86400000); //every 24 hour
+
+// setInterval(tweetApod, 86400000); //every 24 hour
+tweetApod();

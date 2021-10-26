@@ -24,16 +24,14 @@ const getPhoto = () => {
 };
 
 const saveFile = (body) => {
-  console.log("body=>", body);
   const fileName =
-    body.media_type === "image/jpeg || image/jpg" ? "nasa.jpg" : "nasa.mp4";
+    body.media_type === "image/jpeg" || "image/jpg" ? "nasa.jpg" : "nasa.mp4";
   const filePath = path.join(tmpDir + `/${fileName}`);
 
-  console.log(`saveFile: file PATH ${filePath}`);
-  if (fileName === undefined) {
+  if (body.media_type === "video") {
     // tweet the link
     const params = {
-      status: "NASA video link: " + body.url,
+      status: "NASA video: " + body.url,
     };
     postStatus(params);
     return;
@@ -54,7 +52,6 @@ const saveFile = (body) => {
 };
 
 const uploadMedia = (descriptionText, fileName) => {
-  console.log(`uploadMedia: file PATH ${fileName}`);
   T.postMediaChunked(
     {
       file_path: fileName,
