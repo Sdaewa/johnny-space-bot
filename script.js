@@ -11,10 +11,11 @@ const T = new twit(config);
 // RETWEET
 setInterval(() => {
   reTweet(
-    "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration #blackHole"
+    "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration OR #blackHole"
   ); //every 5 hours
 }, 18000000);
-
+reTweet();
+// "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration OR #blackHole"
 // NEWS
 setInterval(tweetNews, 28800000); //every 8 hour
 

@@ -5,6 +5,9 @@ const T = new twit(config);
 
 const reTweet = () => {
   // set search params
+  const searchText =
+    "#spaceX OR #Mars OR #Nasa OR #blueOrigin OR #spaceExploration OR #blackHole";
+
   const params = {
     q: searchText + "",
     result_type: "recent",
